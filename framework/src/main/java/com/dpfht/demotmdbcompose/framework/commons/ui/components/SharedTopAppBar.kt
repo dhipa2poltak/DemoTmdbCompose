@@ -25,7 +25,9 @@ fun SharedTopAppBar(
       title = {
         Text(
           text = title,
-          color = MaterialTheme.colorScheme.onPrimary
+          color = MaterialTheme.colorScheme.onPrimary,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis
         )
       },
       colors = TopAppBarDefaults.topAppBarColors(
