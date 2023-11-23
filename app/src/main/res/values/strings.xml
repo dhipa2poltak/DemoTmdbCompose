@@ -1,0 +1,7 @@
+<resources>
+  <!--<string name="app_name">DemoTmdbCompose</string>-->
+  <string name="app_text_genre_id_required">genreId parameter wasn\'t found. Please make sure it\'s set!</string>
+  <string name="app_text_genre_name_required">genreName parameter wasn\'t found. Please make sure it\'s set!</string>
+  <string name="app_text_movie_id_required">movieId parameter wasn\'t found. Please make sure it\'s set!</string>
+  <string name="app_text_movie_title_required">movieTitle parameter wasn\'t found. Please make sure it\'s set!</string>
+</resources>

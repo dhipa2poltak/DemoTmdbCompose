@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="splash_text_app_name">Demo Tmdb Compose</string>
+  <string name="splash_text_loading">loading…</string>
+</resources>

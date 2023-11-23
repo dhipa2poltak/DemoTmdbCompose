@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="movies_by_genre_text_genre_movies">%1$s Movies</string>
+</resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="movie_details_text_show_review">Show Review</string>
+  <string name="movie_details_text_show_trailer">Show Trailer</string>
+</resources>
