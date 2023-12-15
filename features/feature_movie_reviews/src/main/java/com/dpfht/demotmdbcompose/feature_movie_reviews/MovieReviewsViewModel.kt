@@ -6,12 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dpfht.demotmdbcompose.feature_movie_reviews.event_state.UIEvent
 import com.dpfht.demotmdbcompose.feature_movie_reviews.event_state.UIState
 import com.dpfht.demotmdbcompose.feature_movie_reviews.paging.MovieReviewsDataSource
 import com.dpfht.demotmdbcompose.framework.navigation.NavigationService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,6 +34,15 @@ class MovieReviewsViewModel @Inject constructor(
       }
       UIEvent.OnBackPressed -> {
         navigationService.navigateUp()
+      }
+      UIEvent.Refresh -> {
+        _uiState.value = _uiState.value.copy(
+          isLoaded = false,
+          isLoading = false,
+          reviewState = MutableStateFlow(value = PagingData.empty()),
+          errorMessage = ""
+        )
+        start()
       }
     }
   }

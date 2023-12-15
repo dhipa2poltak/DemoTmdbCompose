@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,6 +49,7 @@ import com.dpfht.demotmdbcompose.feature_movie_reviews.event_state.UIEvent
 import com.dpfht.demotmdbcompose.feature_movie_reviews.event_state.UIEvent.OnBackPressed
 import com.dpfht.demotmdbcompose.framework.commons.ui.components.SharedTopAppBar
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MovieReviewsScreen(
   modifier: Modifier = Modifier,
@@ -56,6 +60,13 @@ fun MovieReviewsScreen(
 ) {
   val state = viewModel.uiState.value
   val reviewPagingItems: LazyPagingItems<ReviewEntity> = viewModel.uiState.value.reviewState.collectAsLazyPagingItems()
+
+  val pullRefreshState = rememberPullRefreshState(
+    refreshing = state.isLoading,
+    onRefresh = {
+      viewModel.onEvent(UIEvent.Refresh)
+    }
+  )
 
   if (state.errorMessage.isNotEmpty()) {
     viewModel.showErrorMessage(state.errorMessage)
@@ -86,7 +97,7 @@ fun MovieReviewsScreen(
             .fillMaxSize()
         ) {
 
-          val (tvTitle, tvMovieTitle, divider, reviewList) = createRefs()
+          val (tvTitle, tvMovieTitle, divider, reviewBox) = createRefs()
 
           val colors = MaterialTheme.colorScheme
 
@@ -127,33 +138,41 @@ fun MovieReviewsScreen(
                 start.linkTo(parent.start)
                 top.linkTo(tvMovieTitle.bottom)
                 end.linkTo(parent.end)
-                bottom.linkTo(reviewList.top)
+                bottom.linkTo(reviewBox.top)
               },
             color = colors.onSurface.copy(alpha = .2f)
           )
 
-          LazyColumn(
-            modifier = modifier
+          Box(
+            modifier = Modifier
               .fillMaxSize()
-              .constrainAs(reviewList) {
+              .constrainAs(reviewBox) {
                 start.linkTo(parent.start)
                 top.linkTo(divider.bottom)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
               }
+              .pullRefresh(pullRefreshState)
           ) {
-            item { Spacer(modifier = Modifier.height(8.dp)) }
-            items(reviewPagingItems.itemCount) { index ->
-              ItemReview(
-                review = reviewPagingItems[index] ?: ReviewEntity()
-              )
+            LazyColumn(
+              modifier = modifier
+                .fillMaxSize()
+            ) {
+              item { Spacer(modifier = Modifier.height(8.dp)) }
+              items(reviewPagingItems.itemCount) { index ->
+                ItemReview(
+                  review = reviewPagingItems[index] ?: ReviewEntity()
+                )
+              }
+              item { Spacer(modifier = Modifier.height(32.dp)) }
             }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-          }
-        }
 
-        if (state.isLoading) {
-          CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            PullRefreshIndicator(
+              refreshing = state.isLoading,
+              state = pullRefreshState,
+              modifier = Modifier.align(Alignment.TopCenter)
+            )
+          }
         }
       }
     }
