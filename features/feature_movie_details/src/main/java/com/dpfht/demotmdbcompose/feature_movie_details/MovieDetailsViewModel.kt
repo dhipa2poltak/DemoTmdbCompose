@@ -39,6 +39,17 @@ class MovieDetailsViewModel @Inject constructor(
       UIEvent.OnBackPressed -> {
         navigationService.navigateUp()
       }
+      UIEvent.Refresh -> {
+        _uiState.value = _uiState.value.copy(
+          isLoaded = false,
+          isLoading = false,
+          errorMessage = "",
+          title = "",
+          imageUrl = "",
+          description = ""
+        )
+        start()
+      }
     }
   }
 

@@ -5,4 +5,5 @@ sealed class UIEvent {
   data class OnClickShowReview(val movieId: Int): UIEvent()
   data class OnClickShowTrailer(val movieId: Int): UIEvent()
   object OnBackPressed: UIEvent()
+  object Refresh: UIEvent()
 }

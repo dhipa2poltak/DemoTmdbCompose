@@ -56,6 +56,7 @@ dependencies {
   implementation(Deps.composeUiToolingPreview)
 
   implementation(Deps.composeMaterial3)
+  implementation(Deps.composeMaterial)
 
   implementation(Deps.hilt)
   kapt(Deps.hiltCompiler)

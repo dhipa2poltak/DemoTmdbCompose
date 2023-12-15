@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,8 +39,10 @@ import coil.compose.AsyncImagePainter.State.Success
 import coil.compose.rememberAsyncImagePainter
 import com.dpfht.demotmdbcompose.feature_movie_details.event_state.UIEvent
 import com.dpfht.demotmdbcompose.feature_movie_details.event_state.UIEvent.OnBackPressed
+import com.dpfht.demotmdbcompose.feature_movie_details.event_state.UIEvent.Refresh
 import com.dpfht.demotmdbcompose.framework.commons.ui.components.SharedTopAppBar
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MovieDetailsScreen(
   screenTitle: String,
@@ -46,6 +51,13 @@ fun MovieDetailsScreen(
 ) {
 
   val state = viewModel.uiState.value
+
+  val pullRefreshState = rememberPullRefreshState(
+    refreshing = state.isLoading,
+    onRefresh = {
+      viewModel.onEvent(Refresh)
+    }
+  )
 
   LaunchedEffect(Unit) {
     viewModel.onEvent(UIEvent.Init(movieId = movieId))
@@ -65,13 +77,14 @@ fun MovieDetailsScreen(
         modifier = Modifier
           .padding(padding)
           .fillMaxSize()
+          .pullRefresh(pullRefreshState)
+          .verticalScroll(rememberScrollState())
       ) {
         Column(
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
           modifier = Modifier
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
         ) {
           val painter = rememberAsyncImagePainter(state.imageUrl)
           val transition by animateFloatAsState(
@@ -127,9 +140,11 @@ fun MovieDetailsScreen(
           }
         }
 
-        if (state.isLoading) {
-          CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
+        PullRefreshIndicator(
+          refreshing = state.isLoading,
+          state = pullRefreshState,
+          modifier = Modifier.align(Alignment.TopCenter)
+        )
       }
     }
   )
