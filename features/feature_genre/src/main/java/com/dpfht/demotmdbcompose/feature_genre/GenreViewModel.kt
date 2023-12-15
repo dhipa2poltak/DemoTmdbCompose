@@ -27,11 +27,15 @@ class GenreViewModel @Inject constructor(
 
   fun onEvent(event: UIEvent) {
     when (event) {
-      is UIEvent.Init -> {
+      UIEvent.Init -> {
         start()
       }
       is UIEvent.OnClickGenreItem -> {
         navigationService.navigate(Screen.MoviesByGenre(event.genreId, event.genreName))
+      }
+      UIEvent.Refresh -> {
+        _uiState.value = _uiState.value.copy(isLoading = false, genres = arrayListOf(), errorMessage = "")
+        start()
       }
     }
   }

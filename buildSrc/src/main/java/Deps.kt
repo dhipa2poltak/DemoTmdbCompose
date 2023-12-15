@@ -7,6 +7,7 @@ object Deps {
   const val composeUiGraphics = "androidx.compose.ui:ui-graphics"
   const val composeUiToolingPreview = "androidx.compose.ui:ui-tooling-preview"
   const val composeMaterial3 = "androidx.compose.material3:material3:${Versions.composeMaterial3}"
+  const val composeMaterial = "androidx.compose.material:material"
 
   const val appCompat = "androidx.appcompat:appcompat:${Versions.appCompat}"
   const val material = "com.google.android.material:material:${Versions.material}"

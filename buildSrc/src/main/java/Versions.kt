@@ -3,7 +3,7 @@ object Versions {
   const val coreKtx = "1.12.0"
   const val lifecycleRuntimeKtx = "2.6.2"
   const val activityCompose = "1.8.1"
-  const val composeBom = "2023.03.00"
+  const val composeBom = "2023.05.01"
   const val composeMaterial3 = "1.2.0-alpha11"
 
   const val appCompat = "1.6.1"

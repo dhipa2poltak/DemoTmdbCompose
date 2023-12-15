@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,6 +35,7 @@ import com.dpfht.demotmdbcompose.domain.entity.GenreEntity
 import com.dpfht.demotmdbcompose.feature_genre.event_state.UIEvent
 import com.dpfht.demotmdbcompose.framework.commons.ui.components.SharedTopAppBar
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun GenreScreen(
   modifier: Modifier = Modifier,
@@ -39,6 +43,13 @@ fun GenreScreen(
   viewModel: GenreViewModel = hiltViewModel()
 ) {
   val state = viewModel.uiState.value
+
+  val pullRefreshState = rememberPullRefreshState(
+    refreshing = state.isLoading,
+    onRefresh = {
+      viewModel.onEvent(UIEvent.Refresh)
+    }
+  )
 
   LaunchedEffect(Unit) {
     viewModel.onEvent(UIEvent.Init)
@@ -60,7 +71,7 @@ fun GenreScreen(
             .fillMaxSize()
         ) {
 
-          val (tvTitle, divider, genreList) = createRefs()
+          val (tvTitle, divider, genrBox) = createRefs()
 
           val colors = MaterialTheme.colorScheme
 
@@ -86,36 +97,47 @@ fun GenreScreen(
                 start.linkTo(parent.start)
                 top.linkTo(tvTitle.bottom)
                 end.linkTo(parent.end)
-                bottom.linkTo(genreList.top)
+                bottom.linkTo(genrBox.top)
               },
             color = colors.onSurface.copy(alpha = .2f)
           )
 
-          LazyColumn(
-            modifier = modifier
+          Box(
+            modifier = Modifier
+              //.padding(padding)
               .fillMaxSize()
-              .constrainAs(genreList) {
+              .constrainAs(genrBox) {
                 start.linkTo(parent.start)
                 top.linkTo(divider.bottom)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
               }
+              .pullRefresh(pullRefreshState)
           ) {
-            item { Spacer(modifier = Modifier.height(8.dp)) }
-            items(state.genres.size) { index ->
-              ItemGenre(
-                genre = state.genres[index],
-                onClickGenreItem = { genreId, genreName ->
-                  viewModel.onEvent(UIEvent.OnClickGenreItem(genreId, genreName))
+            if (state.genres.isNotEmpty()) {
+              LazyColumn(
+                modifier = modifier
+                  .fillMaxSize()
+              ) {
+                item { Spacer(modifier = Modifier.height(8.dp)) }
+                items(state.genres.size) { index ->
+                  ItemGenre(
+                    genre = state.genres[index],
+                    onClickGenreItem = { genreId, genreName ->
+                      viewModel.onEvent(UIEvent.OnClickGenreItem(genreId, genreName))
+                    }
+                  )
                 }
-              )
+                item { Spacer(modifier = Modifier.height(32.dp)) }
+              }
             }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
-          }
-        }
 
-        if (state.isLoading) {
-          CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            PullRefreshIndicator(
+              refreshing = state.isLoading,
+              state = pullRefreshState,
+              modifier = Modifier.align(Alignment.TopCenter)
+            )
+          }
         }
       }
     }
