@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="movie_reviews_text_review">Review</string>
+  <string name="movie_reviews_text_no_data">no data available</string>
 </resources>

@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -173,6 +174,14 @@ fun MovieReviewsScreen(
               modifier = Modifier.align(Alignment.TopCenter)
             )
           }
+        }
+
+        if (state.isLoaded && reviewPagingItems.itemCount == 0) {
+          Text(
+            modifier = Modifier.align(Alignment.Center),
+            text = stringResource(id = R.string.movie_reviews_text_no_data),
+            fontStyle = FontStyle.Italic
+          )
         }
       }
     }
