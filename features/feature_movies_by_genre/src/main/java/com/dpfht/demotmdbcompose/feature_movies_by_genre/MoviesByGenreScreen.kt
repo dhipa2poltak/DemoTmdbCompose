@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,6 +48,7 @@ import com.dpfht.demotmdbcompose.domain.entity.MovieEntity
 import com.dpfht.demotmdbcompose.feature_movies_by_genre.event_state.UIEvent
 import com.dpfht.demotmdbcompose.framework.commons.ui.components.SharedTopAppBar
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MoviesByGenreScreen(
   modifier: Modifier = Modifier,
@@ -55,6 +59,13 @@ fun MoviesByGenreScreen(
 ) {
   val state = viewModel.uiState.value
   val moviePagingItems: LazyPagingItems<MovieEntity> = viewModel.uiState.value.moviesState.collectAsLazyPagingItems()
+
+  val pullRefreshState = rememberPullRefreshState(
+    refreshing = state.isLoading,
+    onRefresh = {
+      viewModel.onEvent(UIEvent.Refresh)
+    }
+  )
 
   if (state.errorMessage.isNotEmpty()) {
     viewModel.showErrorMessage(state.errorMessage)
@@ -85,7 +96,7 @@ fun MoviesByGenreScreen(
             .fillMaxSize()
         ) {
 
-          val (tvTitle, divider, movieList) = createRefs()
+          val (tvTitle, divider, movieBox) = createRefs()
 
           val colors = MaterialTheme.colorScheme
 
@@ -111,37 +122,53 @@ fun MoviesByGenreScreen(
                 start.linkTo(parent.start)
                 top.linkTo(tvTitle.bottom)
                 end.linkTo(parent.end)
-                bottom.linkTo(movieList.top)
+                bottom.linkTo(movieBox.top)
               },
             color = colors.onSurface.copy(alpha = .2f)
           )
 
-          LazyColumn(
-            modifier = modifier
+          Box(
+            modifier = Modifier
               .fillMaxSize()
-              .constrainAs(movieList) {
+              .constrainAs(movieBox) {
                 start.linkTo(parent.start)
                 top.linkTo(divider.bottom)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
               }
+              .pullRefresh(pullRefreshState)
           ) {
-            item { Spacer(modifier = Modifier.height(8.dp)) }
-            items(moviePagingItems.itemCount) { index ->
-              ItemMovie(
-                movie = moviePagingItems[index] ?: MovieEntity(),
-                onClickMovieItem = { movieId ->
-                  viewModel.onEvent(UIEvent.OnClickMovieItem(movieId))
+            if (moviePagingItems.itemCount > 0) {
+              LazyColumn(
+                modifier = modifier
+                  .fillMaxSize()
+              ) {
+                item { Spacer(modifier = Modifier.height(8.dp)) }
+                items(moviePagingItems.itemCount) { index ->
+                  ItemMovie(
+                    movie = moviePagingItems[index] ?: MovieEntity(),
+                    onClickMovieItem = { movieId ->
+                      viewModel.onEvent(UIEvent.OnClickMovieItem(movieId))
+                    }
+                  )
                 }
-              )
+                item { Spacer(modifier = Modifier.height(32.dp)) }
+              }
             }
-            item { Spacer(modifier = Modifier.height(32.dp)) }
+
+            PullRefreshIndicator(
+              refreshing = state.isLoading,
+              state = pullRefreshState,
+              modifier = Modifier.align(Alignment.TopCenter)
+            )
           }
         }
 
+        /*
         if (state.isLoading) {
           CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
+        */
       }
     }
   )

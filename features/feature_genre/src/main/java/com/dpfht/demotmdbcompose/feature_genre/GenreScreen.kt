@@ -71,7 +71,7 @@ fun GenreScreen(
             .fillMaxSize()
         ) {
 
-          val (tvTitle, divider, genrBox) = createRefs()
+          val (tvTitle, divider, genreBox) = createRefs()
 
           val colors = MaterialTheme.colorScheme
 
@@ -97,16 +97,15 @@ fun GenreScreen(
                 start.linkTo(parent.start)
                 top.linkTo(tvTitle.bottom)
                 end.linkTo(parent.end)
-                bottom.linkTo(genrBox.top)
+                bottom.linkTo(genreBox.top)
               },
             color = colors.onSurface.copy(alpha = .2f)
           )
 
           Box(
             modifier = Modifier
-              //.padding(padding)
               .fillMaxSize()
-              .constrainAs(genrBox) {
+              .constrainAs(genreBox) {
                 start.linkTo(parent.start)
                 top.linkTo(divider.bottom)
                 end.linkTo(parent.end)
